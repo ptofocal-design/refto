@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>REFTO</title>
+<meta name="theme-color" content="#03060F">
+<meta name="description" content="Reformá ambientes de tu casa desde una foto, con IA.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="mark.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03060F;--panel:#080E1E;--panel2:#101A33;--line:#1A2747;--ink:#EEF4FF;--muted:#8797BC;--faint:#56658A;
+  --cyan:#16E6FF;--sky:#1AA8FF;--blue:#1F62FF;--ok:#3FE0C0;--bad:#FF5A6E;
+  --grad:linear-gradient(135deg,var(--cyan),var(--sky) 45%,var(--blue));
+  --display:"Outfit",system-ui,sans-serif;--body:"Onest","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding:0 14px}
+header{position:sticky;top:0;z-index:20;padding:calc(8px + env(safe-area-inset-top)) 0 8px;
+  background:radial-gradient(520px 120px at 0% 0%,rgba(26,168,255,.22),transparent 70%),rgba(8,14,30,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--grad);opacity:.6}
+header .wrap{display:flex;align-items:center;gap:11px}
+header .icon{width:38px;height:38px;border-radius:10px;box-shadow:0 6px 22px -6px rgba(26,168,255,.8)}
+header .word{height:17px;display:block}
+header small{font:600 8.5px var(--display);letter-spacing:2.6px;color:var(--muted);display:block;margin-top:4px;text-transform:uppercase}
+header .sp{flex:1}
+.ibtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;cursor:pointer}
+.ibtn svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}
+h3{font:700 11px var(--display);text-transform:uppercase;letter-spacing:1.4px;color:var(--faint);margin:0 0 9px}
+.hint{color:var(--faint);font-size:12.5px;margin-top:7px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input[type=text],input[type=password],select,textarea{width:100%;border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:10px 11px;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(26,168,255,.18)}
+textarea{min-height:92px;resize:vertical}
+::placeholder{color:var(--faint)}
+.btn{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:10px 14px;font:600 14px var(--body);cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none}
+.btn:active{transform:scale(.98)}
+.btn.sm{padding:7px 11px;font-size:13px}
+.btn.on{background:rgba(22,230,255,.12);color:var(--cyan);border-color:rgba(22,230,255,.55)}
+.btn.prim{background:var(--grad);border-color:transparent;color:#02101f;font:700 16px var(--display);letter-spacing:.4px;box-shadow:0 6px 20px -8px rgba(26,168,255,.85)}
+.btn.prim:disabled{opacity:.4}
+.btn.big{flex:1;padding:14px 10px;flex-direction:column;gap:6px;font-size:14px}
+.btn.big svg{width:28px;height:28px;stroke:var(--cyan);fill:none;stroke-width:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:7px 12px;cursor:pointer;user-select:none;font-size:13.5px}
+.chip.on{background:rgba(22,230,255,.12);color:var(--cyan);border-color:rgba(22,230,255,.55);box-shadow:0 0 14px -6px var(--cyan)}
+.seg{display:flex;border:1px solid var(--line);border-radius:11px;background:var(--bg);padding:3px;gap:2px}
+.seg button{flex:1;border:0;background:transparent;padding:8px 4px;font:600 14px var(--display);cursor:pointer;color:var(--muted);border-radius:8px}
+.seg button.on{background:var(--panel2);color:var(--cyan);box-shadow:0 0 0 1px rgba(22,230,255,.4) inset}
+input[type=range]{accent-color:var(--sky);flex:1;min-width:120px}
+
+#vacio{display:flex;gap:10px}
+#marco{position:relative;display:none;margin:0 auto;border-radius:10px;overflow:hidden;background:var(--panel2);touch-action:pan-y;box-shadow:0 0 0 1px var(--line),0 18px 50px -14px rgba(26,168,255,.4);user-select:none}
+#marco img,#marco canvas{position:absolute;inset:0;width:100%;height:100%;display:block;-webkit-user-drag:none}
+#mask{opacity:.5}
+#despues{display:none}
+#tirador{position:absolute;top:0;bottom:0;width:0;display:none;z-index:5}
+#tirador::before{content:"";position:absolute;top:0;bottom:0;left:-1.5px;width:3px;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+#tirador span{position:absolute;top:50%;left:-20px;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:var(--grad);box-shadow:0 0 18px -2px var(--cyan);display:grid;place-items:center;font-weight:800;color:#02101f}
+.etq{position:absolute;top:8px;padding:3px 9px;border-radius:6px;background:rgba(3,6,15,.72);border:1px solid var(--line);font:600 12px var(--display);display:none;z-index:4}
+#etqA{left:8px}#etqD{right:8px;color:var(--cyan)}
+#titulo{font:600 14px var(--display);color:var(--muted);margin:10px 0 0;min-height:20px}
+#herrFoto,#herrComp{margin-top:10px}
+#cargando{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(3,6,15,.86);z-index:50;flex-direction:column;gap:12px;font:600 16px var(--display);text-align:center;padding:20px}
+.spin{width:46px;height:46px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--cyan);animation:g 1s linear infinite;box-shadow:0 0 22px -8px var(--cyan)}
+@keyframes g{to{transform:rotate(360deg)}}
+#barraFija{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:12px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 35%)}
+#barraFija .wrap{padding:0}
+#reformar{width:100%;padding:15px}
+#error{display:none;background:rgba(255,90,110,.1);color:#ffb3bd;border:1px solid rgba(255,90,110,.45);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:14px}
+.item{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:10px;margin-top:10px}
+.item .ped{font-size:13.5px;margin-bottom:4px}
+.item .tags{color:var(--muted);font-size:12px;margin-bottom:8px}
+.item .th{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.item .th img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent}
+.item .th img.sel{border-color:var(--cyan);box-shadow:0 0 12px -3px var(--cyan)}
+.item .acc{display:flex;gap:6px;margin-top:8px}
+.vacioH{color:var(--faint);font-size:13.5px}
+#clave .estado{font-size:13px;margin-top:8px}
+.pie{color:var(--faint);font-size:11.5px;text-align:center;margin:22px 0 6px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <img class="icon" src="mark.png" alt="">
+  <div><img class="word" src="wordmark.png" alt="REFTO"><small>Reformas de la casa con IA</small></div>
+  <div class="sp"></div>
+  <button class="ibtn" id="abrirClave" aria-label="Clave de la IA"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg></button>
+</div></header>
+
+<main class="wrap">
+  <section class="card" id="clave" hidden>
+    <h3>Clave de la IA</h3>
+    <input type="password" id="key" placeholder="sk-…" autocomplete="off">
+    <div class="row" style="margin-top:9px"><button class="btn sm" id="guardarClave">Guardar</button><button class="btn sm" id="borrarClave">Borrar clave</button></div>
+    <div class="estado" id="claveEstado"></div>
+    <div class="hint">Queda guardada solo en este teléfono. Cada reforma usa el saldo de esa clave.</div>
+  </section>
+
+  <section class="card">
+    <h3>Proyecto</h3>
+    <div class="row" style="flex-wrap:nowrap">
+      <input type="text" id="proyecto" placeholder="Nombre (ej: Patio, Cocina)">
+      <select id="proyectos" style="width:auto;max-width:44%"></select>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>1 · Foto del ambiente</h3>
+    <div id="vacio">
+      <button class="btn big" id="sacar"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Sacar foto</button>
+      <button class="btn big" id="galeria"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 17l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.6"/></svg>Elegir de la galería</button>
+    </div>
+    <input type="file" id="fCam" accept="image/*" capture="environment" hidden>
+    <input type="file" id="fGal" accept="image/*" hidden>
+    <div id="marco">
+      <img id="base" alt=""><img id="despues" alt=""><canvas id="mask"></canvas>
+      <div id="tirador"><span>⇆</span></div>
+      <div class="etq" id="etqA">Antes</div><div class="etq" id="etqD">Después</div>
+    </div>
+    <div id="titulo"></div>
+    <div id="herrFoto" hidden>
+      <div class="row">
+        <button class="btn sm" id="pincel">Marcar zona</button>
+        <button class="btn sm" id="goma">Goma</button>
+        <button class="btn sm" id="limpiar">Borrar marca</button>
+        <button class="btn sm" id="otraFoto">Otra foto</button>
+      </div>
+      <div class="row" style="margin-top:8px" id="filaTam" hidden><span class="hint" style="margin:0">Tamaño</span><input type="range" id="tam" min="10" max="120" value="40"></div>
+      <div class="hint">Opcional: marcá con el dedo lo que querés cambiar (por ej. solo el piso). Sin marca, la IA cambia lo que pedís respetando paredes y aberturas.</div>
+    </div>
+    <div id="herrComp" hidden>
+      <div class="row">
+        <button class="btn sm" id="verBase">Ver foto base</button>
+        <button class="btn sm on" id="seguir">Seguir desde ésta</button>
+        <button class="btn sm" id="bajar">Guardar / compartir</button>
+      </div>
+      <div class="hint">Deslizá el dedo sobre la foto para comparar antes y después.</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>2 · Qué querés cambiar</h3>
+    <div class="chips" id="cambiar"></div>
+  </section>
+  <section class="card">
+    <h3>3 · Estilo</h3>
+    <div class="chips" id="estilo"></div>
+  </section>
+  <section class="card">
+    <h3>4 · Contale qué querés</h3>
+    <textarea id="pedido" placeholder="Ej: deck de madera en el piso, jardín vertical en la pared del fondo, guirnalda de luces y dos sillones chicos."></textarea>
+  </section>
+  <section class="card">
+    <h3>Opciones</h3>
+    <div class="hint" style="margin:0 0 6px">Cuántas variantes</div>
+    <div class="seg" id="cant"><button>1</button><button class="on">2</button><button>3</button><button>4</button></div>
+    <div class="hint" style="margin:12px 0 6px">Calidad</div>
+    <div class="seg" id="cal"><button data-v="low">Borrador</button><button data-v="medium" class="on">Normal</button><button data-v="high">Alta</button></div>
+    <div class="hint">Borrador sale rápido y barato para probar ideas; Alta para la versión que te gusta.</div>
+  </section>
+
+  <section class="card">
+    <h3>Reformas de este proyecto</h3>
+    <div id="hist"><div class="vacioH">Todavía no hay reformas.</div></div>
+  </section>
+  <div class="pie" id="ver"></div>
+</main>
+
+<div id="barraFija"><div class="wrap">
+  <div id="error"></div>
+  <button class="btn prim" id="reformar" disabled>Reformar</button>
+</div></div>
+<div id="cargando"><div class="spin"></div><div id="cargTxt">La IA está reformando…</div><div class="hint">Tarda entre 30 segundos y 2 minutos. No cierres la app.</div></div>
+
+<script>
+const VERSION = 'v1';
+const $ = s => document.querySelector(s);
+const store = {
+  get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
+  del: k => { try { localStorage.removeItem(k); } catch (e) {} },
+};
+$('#ver').textContent = 'REFTO ' + VERSION;
+
+const CAMBIAR = ['Piso', 'Paredes y pintura', 'Techo / cielorraso', 'Muebles', 'Cocina', 'Baño', 'Iluminación', 'Aberturas', 'Patio / jardín', 'Fachada', 'Decoración', 'Todo el ambiente'];
+const ESTILOS = ['Como está, solo lo pedido', 'Moderno', 'Nórdico', 'Minimalista', 'Cálido con madera', 'Industrial', 'Rústico / campo', 'Colonial salteño', 'Mediterráneo', 'Contemporáneo de lujo', 'Económico y práctico'];
+const REGLAS = 'Es una FOTO REAL de un ambiente de mi casa que quiero reformar. ' +
+  'Mantené exactamente la misma cámara, encuadre, perspectiva y lente. ' +
+  'No muevas ni cambies paredes, ventanas, puertas, aberturas, columnas ni la forma del ambiente, salvo que el pedido lo diga. ' +
+  'Cambiá SOLO lo que se pide; el resto queda igual. ' +
+  'Resultado fotorrealista, como una foto sacada con el celular después de la obra: materiales reales y comunes en Argentina, ' +
+  'terminaciones creíbles, luz natural coherente con la foto original. Sin texto, sin carteles, sin marcas de agua.';
+const MAXLADO = 1536;
+
+// ---------- base de datos local (IndexedDB): fotos y proyectos quedan en el teléfono ----------
+const db = new Promise((ok, mal) => {
+  const r = indexedDB.open('refto', 1);
+  r.onupgradeneeded = () => { r.result.createObjectStore('img'); r.result.createObjectStore('proy'); };
+  r.onsuccess = () => ok(r.result); r.onerror = () => mal(r.error);
+});
+async function tx(tienda, modo, fn) {
+  const d = await db;
+  return new Promise((ok, mal) => { const t = d.transaction(tienda, modo); const r = fn(t.objectStore(tienda)); t.oncomplete = () => ok(r && r.result); t.onerror = () => mal(t.error); });
+}
+const imgPut = (id, blob) => tx('img', 'readwrite', s => s.put(blob, id));
+const imgGet = id => tx('img', 'readonly', s => s.get(id));
+const imgDel = id => tx('img', 'readwrite', s => s.delete(id));
+const proyGet = n => tx('proy', 'readonly', s => s.get(n));
+const proyPut = (n, v) => tx('proy', 'readwrite', s => s.put(v, n));
+const proyTodos = async () => { const d = await db; return new Promise(ok => { const out = []; const c = d.transaction('proy').objectStore('proy').openCursor(); c.onsuccess = () => { const k = c.result; if (!k) return ok(out); out.push({ nombre: k.key, ...k.value }); k.continue(); }; }); };
+const urls = new Map();
+async function urlDe(id) { if (urls.has(id)) return urls.get(id); const b = await imgGet(id); if (!b) return ''; const u = URL.createObjectURL(b); urls.set(id, u); return u; }
+const nuevoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+// ---------- clave ----------
+function estadoClave() {
+  const k = store.get('oai_key');
+  $('#claveEstado').textContent = k ? '✓ Clave guardada en este teléfono' : 'Falta cargar la clave para poder reformar.';
+  $('#claveEstado').style.color = k ? 'var(--ok)' : 'var(--muted)';
+  if (!k) $('#clave').hidden = false;
+}
+$('#abrirClave').onclick = () => { $('#clave').hidden = !$('#clave').hidden; if (!$('#clave').hidden) $('#clave').scrollIntoView({ behavior: 'smooth' }); };
+$('#guardarClave').onclick = () => { const v = $('#key').value.trim(); if (!v) return; store.set('oai_key', v); $('#key').value = ''; estadoClave(); setTimeout(() => $('#clave').hidden = true, 900); };
+$('#borrarClave').onclick = () => { if (confirm('¿Borrar la clave de este teléfono?')) { store.del('oai_key'); estadoClave(); } };
+estadoClave();
+
+// ---------- estado y controles ----------
+const st = { cambiar: new Set(), estilo: ESTILOS[0], base: null, baseId: null, W: 0, H: 0, herr: null, pintado: false, sel: null, selId: null, original: null };
+function chips(el, lista, multi) {
+  for (const t of lista) {
+    const c = document.createElement('span'); c.className = 'chip'; c.textContent = t;
+    if (!multi && t === st.estilo) c.classList.add('on');
+    c.onclick = () => {
+      if (multi) { c.classList.toggle('on'); c.classList.contains('on') ? st.cambiar.add(t) : st.cambiar.delete(t); }
+      else { el.querySelectorAll('.chip').forEach(x => x.classList.remove('on')); c.classList.add('on'); st.estilo = t; }
+    };
+    el.appendChild(c);
+  }
+}
+chips($('#cambiar'), CAMBIAR, true); chips($('#estilo'), ESTILOS, false);
+function seg(id) { const el = $(id); el.querySelectorAll('button').forEach(b => b.onclick = () => { el.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); }); }
+seg('#cant'); seg('#cal');
+const segVal = id => { const b = $(id + ' .on'); return b.dataset.v || b.textContent; };
+
+// ---------- proyectos ----------
+const proyectoActual = () => ($('#proyecto').value.trim() || 'Sin nombre').slice(0, 60);
+async function listarProyectos(sel) {
+  const l = (await proyTodos()).sort((a, b) => (b.mod || 0) - (a.mod || 0));
+  const s = $('#proyectos'); s.innerHTML = '<option value="">Abrir…</option>';
+  for (const p of l) { const o = document.createElement('option'); o.value = p.nombre; o.textContent = `${p.nombre} (${p.items.length})`; s.appendChild(o); }
+  s.value = sel || '';
+}
+$('#proyectos').onchange = async e => { if (!e.target.value) return; $('#proyecto').value = e.target.value; await cargarProyecto(e.target.value, true); };
+async function cargarProyecto(nombre, usarOriginal) {
+  const h = await proyGet(nombre) || { items: [] };
+  st.original = h.original || null;
+  await pintarHist(h);
+  if (usarOriginal && h.original) await ponerBase(await urlDe(h.original), h.original);
+  store.set('refto.proyecto', nombre);
+}
+
+// ---------- foto ----------
+$('#sacar').onclick = () => $('#fCam').click();
+$('#galeria').onclick = () => $('#fGal').click();
+$('#otraFoto').onclick = () => $('#fGal').click();
+for (const f of ['#fCam', '#fGal']) $(f).onchange = e => { const a = e.target.files[0]; e.target.value = ''; if (a) leerArchivo(a); };
+function leerArchivo(f) {
+  const u = URL.createObjectURL(f);
+  if (!$('#proyecto').value.trim()) $('#proyecto').value = 'Ambiente ' + new Date().toLocaleDateString('es-AR');
+  ponerBase(u, null);
+}
+const cargarImg = src => new Promise((ok, mal) => { const i = new Image(); i.onload = () => ok(i); i.onerror = mal; i.src = src; });
+
+async function ponerBase(src, id) {
+  const img = await cargarImg(src);
+  const k = Math.min(1, MAXLADO / Math.max(img.naturalWidth, img.naturalHeight));
+  const W = Math.round(img.naturalWidth * k), H = Math.round(img.naturalHeight * k);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  c.getContext('2d').drawImage(img, 0, 0, W, H);
+  st.base = c; st.W = W; st.H = H; st.baseId = id;
+  $('#base').src = id ? src : c.toDataURL('image/jpeg', .92);
+  const m = $('#mask'); m.width = W; m.height = H; mctx.clearRect(0, 0, W, H); st.pintado = false;
+  $('#vacio').style.display = 'none'; $('#marco').style.display = 'block';
+  $('#reformar').disabled = false;
+  verBase(); ajustar();
+}
+function ajustar() {
+  if (!st.W) return;
+  const mw = $('#marco').parentElement.clientWidth - 28, mh = innerHeight * 0.62;
+  const k = Math.min(mw / st.W, mh / st.H);
+  Object.assign($('#marco').style, { width: st.W * k + 'px', height: st.H * k + 'px' });
+}
+addEventListener('resize', ajustar);
+
+// ---------- marcar zona con el dedo ----------
+const mk = $('#mask'), mctx = mk.getContext('2d');
+function herr(h) {
+  st.herr = st.herr === h ? null : h;
+  $('#pincel').classList.toggle('on', st.herr === 'p'); $('#goma').classList.toggle('on', st.herr === 'g');
+  $('#filaTam').hidden = !st.herr;
+  $('#marco').style.touchAction = st.herr ? 'none' : 'pan-y';
+  mk.style.pointerEvents = st.herr ? 'auto' : 'none';
+}
+$('#pincel').onclick = () => herr('p'); $('#goma').onclick = () => herr('g');
+$('#limpiar').onclick = () => { mctx.clearRect(0, 0, mk.width, mk.height); st.pintado = false; };
+mk.style.pointerEvents = 'none';
+let dibujando = false, ult = null;
+function pos(e) { const r = mk.getBoundingClientRect(); return [(e.clientX - r.left) * mk.width / r.width, (e.clientY - r.top) * mk.height / r.height]; }
+function trazo(a, b) {
+  const t = +$('#tam').value * mk.width / mk.getBoundingClientRect().width;
+  mctx.globalCompositeOperation = st.herr === 'g' ? 'destination-out' : 'source-over';
+  mctx.strokeStyle = '#16E6FF'; mctx.lineCap = mctx.lineJoin = 'round'; mctx.lineWidth = t;
+  mctx.beginPath(); mctx.moveTo(...a); mctx.lineTo(...b); mctx.stroke();
+  if (st.herr === 'p') st.pintado = true;
+}
+mk.addEventListener('pointerdown', e => { if (!st.herr) return; e.preventDefault(); dibujando = true; mk.setPointerCapture(e.pointerId); ult = pos(e); trazo(ult, ult); });
+mk.addEventListener('pointermove', e => { if (!dibujando) return; const p = pos(e); trazo(ult, p); ult = p; });
+mk.addEventListener('pointerup', () => { dibujando = false; if (st.pintado) st.pintado = hayMarca(); });
+function hayMarca() { const d = mctx.getImageData(0, 0, mk.width, mk.height).data; for (let i = 3; i < d.length; i += 64) if (d[i] > 10) return true; return false; }
+function mascaraBlob() {
+  const c = document.createElement('canvas'); c.width = mk.width; c.height = mk.height; const x = c.getContext('2d');
+  x.fillStyle = '#000'; x.fillRect(0, 0, c.width, c.height);
+  x.globalCompositeOperation = 'destination-out'; x.drawImage(mk, 0, 0);   // transparente = zona que la IA puede cambiar
+  return new Promise(ok => c.toBlob(ok, 'image/png'));
+}
+
+// ---------- comparar ----------
+let corte = 0.5, comparando = false;
+function verBase() {
+  comparando = false;
+  if (st.base) $('#base').src = st.baseId ? (urls.get(st.baseId) || $('#base').src) : st.base.toDataURL('image/jpeg', .92);
+  $('#despues').style.display = $('#tirador').style.display = $('#etqA').style.display = $('#etqD').style.display = 'none';
+  mk.style.display = 'block';
+  $('#herrFoto').hidden = false; $('#herrComp').hidden = true;
+  $('#titulo').textContent = st.baseId && st.baseId !== st.original ? 'Foto base: una reforma anterior' : 'Foto base';
+  document.querySelectorAll('.item img.sel').forEach(i => i.classList.remove('sel'));
+  st.sel = st.selId = null;
+}
+$('#verBase').onclick = verBase;
+async function comparar(id, item, imgEl) {
+  if (st.herr) herr(st.herr);
+  comparando = true; st.selId = id; st.sel = await urlDe(id);
+  $('#base').src = await urlDe(item.base || st.original);
+  $('#despues').src = st.sel; $('#despues').style.display = 'block';
+  mk.style.display = 'none';
+  $('#tirador').style.display = $('#etqA').style.display = $('#etqD').style.display = 'block';
+  ponerCorte(corte);
+  $('#herrFoto').hidden = true; $('#herrComp').hidden = false;
+  $('#titulo').textContent = item.pedido ? '“' + item.pedido.slice(0, 80) + (item.pedido.length > 80 ? '…' : '') + '”' : 'Reforma';
+  document.querySelectorAll('.item img.sel').forEach(i => i.classList.remove('sel')); imgEl && imgEl.classList.add('sel');
+  $('#marco').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function ponerCorte(f) { corte = Math.max(0, Math.min(1, f)); $('#despues').style.clipPath = `inset(0 0 0 ${corte * 100}%)`; $('#tirador').style.left = corte * 100 + '%'; }
+let arrastra = false;
+$('#marco').addEventListener('pointerdown', e => { if (!comparando) return; arrastra = true; $('#marco').setPointerCapture(e.pointerId); mover(e); });
+$('#marco').addEventListener('pointermove', e => arrastra && mover(e));
+$('#marco').addEventListener('pointerup', () => arrastra = false);
+$('#marco').addEventListener('pointercancel', () => arrastra = false);
+function mover(e) { const r = $('#marco').getBoundingClientRect(); ponerCorte((e.clientX - r.left) / r.width); }
+// mientras se compara, deslizar en horizontal mueve el divisor sin desplazar la página
+$('#marco').addEventListener('touchmove', e => { if (comparando) e.preventDefault(); }, { passive: false });
+
+$('#seguir').onclick = async () => { if (!st.selId) return; await ponerBase(st.sel, st.selId); $('#titulo').textContent = 'Foto base: seguís desde la reforma elegida'; scrollTo({ top: document.querySelector('#cambiar').closest('.card').offsetTop - 70, behavior: 'smooth' }); };
+$('#bajar').onclick = async () => {
+  if (!st.selId) return;
+  const b = await imgGet(st.selId);
+  const nombre = `REFTO-${proyectoActual().replace(/[^\wáéíóúñ -]/gi, '')}-${st.selId}.jpg`;
+  const f = new File([b], nombre, { type: b.type || 'image/jpeg' });
+  if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: 'Reforma REFTO' }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = nombre; a.click();
+};
+
+// ---------- historial ----------
+async function pintarHist(h) {
+  const el = $('#hist'); el.innerHTML = '';
+  if (!h.items || !h.items.length) { el.innerHTML = '<div class="vacioH">Todavía no hay reformas.</div>'; return; }
+  for (const it of h.items) {
+    const d = document.createElement('div'); d.className = 'item';
+    const tags = [it.cambiar, it.estilo && it.estilo !== ESTILOS[0] ? it.estilo : '', it.zona ? 'con zona' : '', it.sobreReforma ? 'sobre otra reforma' : ''].filter(Boolean).join(' · ');
+    d.innerHTML = `<div class="ped"></div><div class="tags"></div><div class="th"></div><div class="acc"><button class="btn sm">Repetir pedido</button><button class="btn sm">Quitar</button></div>`;
+    d.querySelector('.ped').textContent = it.pedido || '(sin texto)';
+    d.querySelector('.tags').textContent = tags;
+    for (const id of it.imagenes) { const i = document.createElement('img'); i.src = await urlDe(id); i.onclick = () => comparar(id, it, i); d.querySelector('.th').appendChild(i); }
+    const [rep, quitar] = d.querySelectorAll('.acc button');
+    rep.onclick = () => { $('#pedido').value = it.pedido || ''; $('#pedido').focus(); };
+    quitar.onclick = async () => {
+      if (!confirm('¿Borrar esta reforma del teléfono?')) return;
+      const p = await proyGet(proyectoActual()); p.items = p.items.filter(x => x.id !== it.id);
+      const enUso = new Set([p.original, ...p.items.flatMap(x => [x.base, ...x.imagenes])]);
+      for (const id of it.imagenes) if (!enUso.has(id)) await imgDel(id);
+      await proyPut(proyectoActual(), p); verBase(); cargarProyecto(proyectoActual()); listarProyectos(proyectoActual());
+    };
+    el.appendChild(d);
+  }
+}
+
+// ---------- reformar ----------
+const aBlob = (c, tipo, q) => new Promise(ok => c.toBlob(ok, tipo, q));
+$('#reformar').onclick = async () => {
+  const clave = store.get('oai_key');
+  if (!clave) { error('Primero cargá la clave de la IA (botón de la llave, arriba).'); $('#clave').hidden = false; $('#clave').scrollIntoView({ behavior: 'smooth' }); return; }
+  const pedido = $('#pedido').value.trim();
+  if (!pedido && !st.cambiar.size) { error('Elegí qué querés cambiar o escribí el pedido.'); return; }
+  error('');
+  const cambiar = st.cambiar.size ? 'Cambiar: ' + [...st.cambiar].join(', ') + '.' : '';
+  const estilo = st.estilo !== ESTILOS[0] ? 'Estilo: ' + st.estilo + '.' : 'Mantener el estilo general de la casa.';
+  const zona = st.pintado;
+  let prompt = REGLAS + '\n\nPEDIDO: ' + (pedido || 'renovarlo') + '\n' + [cambiar, estilo].filter(Boolean).join('\n');
+  if (zona) prompt += '\nSolo se modifica la zona marcada; fuera de esa zona la foto queda idéntica.';
+  const n = +segVal('#cant'), calidad = segVal('#cal');
+  $('#cargando').style.display = 'flex'; $('#reformar').disabled = true;
+  $('#cargTxt').textContent = n > 1 ? `La IA está haciendo ${n} variantes…` : 'La IA está reformando…';
+  try {
+    const fd = new FormData();
+    fd.append('model', 'gpt-image-2'); fd.append('prompt', prompt); fd.append('n', String(n));
+    fd.append('quality', calidad); fd.append('size', 'auto');
+    fd.append('image[]', await aBlob(st.base, 'image/png'), 'foto.png');
+    if (zona) fd.append('mask', await mascaraBlob(), 'mascara.png');
+    let r;
+    try { r = await fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { Authorization: 'Bearer ' + clave }, body: fd }); }
+    catch (e) { throw new Error('No hay conexión con la IA. Revisá internet y probá de nuevo.'); }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const m = (j.error && j.error.message) || ('error ' + r.status);
+      if (r.status === 401) throw new Error('La clave no es válida. Revisala con el botón de la llave.');
+      if (/billing|quota|insufficient/i.test(m)) throw new Error('La clave se quedó sin saldo.');
+      throw new Error('La IA respondió: ' + m);
+    }
+    // guardar todo en el teléfono
+    const nombre = proyectoActual();
+    const p = await proyGet(nombre) || { items: [] };
+    if (!st.baseId) { st.baseId = 'o' + nuevoId(); await imgPut(st.baseId, await aBlob(st.base, 'image/jpeg', .92)); if (!p.original) p.original = st.baseId; }
+    const ids = [];
+    for (const d of j.data) {
+      const bin = Uint8Array.from(atob(d.b64_json), ch => ch.charCodeAt(0));
+      const img = await cargarImg(URL.createObjectURL(new Blob([bin], { type: 'image/png' })));
+      const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0);
+      const id = 'r' + nuevoId(); await imgPut(id, await aBlob(c, 'image/jpeg', .92)); ids.push(id);
+    }
+    const item = { id: nuevoId(), fecha: Date.now(), pedido, cambiar, estilo: st.estilo, zona, calidad, base: st.baseId,
+      sobreReforma: st.baseId !== p.original, imagenes: ids };
+    p.items.unshift(item); p.mod = Date.now();
+    await proyPut(nombre, p);
+    st.original = p.original;
+    await cargarProyecto(nombre); listarProyectos(nombre);
+    await comparar(ids[0], item, document.querySelector('.item .th img'));
+  } catch (e) { error(e.message); }
+  finally { $('#cargando').style.display = 'none'; $('#reformar').disabled = false; }
+};
+function error(t) { const e = $('#error'); e.textContent = t; e.style.display = t ? 'block' : 'none'; }
+
+// ---------- arranque ----------
+(async () => {
+  const ult = store.get('refto.proyecto');
+  await listarProyectos(ult);
+  if (ult && await proyGet(ult)) { $('#proyecto').value = ult; await cargarProyecto(ult, true); }
+})();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
